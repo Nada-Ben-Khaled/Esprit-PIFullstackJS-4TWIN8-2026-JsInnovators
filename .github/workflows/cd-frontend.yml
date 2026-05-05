@@ -1,0 +1,52 @@
+name: CD Frontend
+
+on:
+  workflow_run:
+    workflows: ["CI Frontend"]
+    types:
+      - completed
+    branches: [main]
+
+jobs:
+  deploy:
+    name: Build & Push Frontend Docker Image
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check if Dockerfile exists
+        id: check_dockerfile
+        run: |
+          if [ -f "./frontend/Dockerfile" ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "⚠️ No Dockerfile found in frontend/ — skipping Docker build"
+          fi
+
+      - name: Login to DockerHub
+        if: steps.check_dockerfile.outputs.exists == 'true'
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push frontend image
+        if: steps.check_dockerfile.outputs.exists == 'true'
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          file: ./frontend/Dockerfile
+          push: true
+          tags: takouanaceur/medifolllow-frontend:latest
+
+      - name: Deployment summary
+        run: |
+          if [ "${{ steps.check_dockerfile.outputs.exists }}" == "true" ]; then
+            echo "✅ Frontend image pushed to DockerHub"
+          else
+            echo "⏭️ Docker build skipped — Dockerfile not found yet"
+          fi

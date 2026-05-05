@@ -1,0 +1,151 @@
+@use "../variables" as *;
+
+html .topbar {
+  background-color: var(--mat-sys-surface);
+  position: sticky;
+  top: 0;
+  z-index: 9;
+  height: $header-height;
+  border-radius: $border-radius;
+  box-shadow: var(--mat-sys-level2);
+}
+
+.topbar-dd {
+  min-width: 13.75rem !important;  /* 220px ÷ 16 - WCAG Accessible */
+}
+
+.upgrade-bg {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  height: 100%;
+}
+
+.object-cover {
+  object-fit: cover;
+}
+
+// Alert bell badge
+.bell-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.alert-badge {
+  position: absolute;
+  top: -0.375rem;                 /* -6px ÷ 16 */
+  right: -0.5rem;                 /* -8px ÷ 16 */
+  background: #ef5350;
+  color: #fff;
+  font-size: 0.625rem;            /* 10px ÷ 16 - WCAG Accessible */
+  font-weight: 700;
+  min-width: 1.125rem;            /* 18px ÷ 16 */
+  height: 1.125rem;               /* 18px ÷ 16 */
+  border-radius: 0.5625rem;       /* 9px ÷ 16 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 0.25rem;             /* 0 4px ÷ 16 */
+  line-height: 1;
+}
+
+.profile-dd {
+  margin-top: -0.3125rem;         /* -5px ÷ 16 */
+  margin-left: -0.3125rem;        /* -5px ÷ 16 */
+}
+
+
+
+// App Topstrip
+
+.app-topstrip {
+  position: fixed;
+  top: 0;
+  z-index: 12;
+  display: flex;
+  background: #468ecf;
+
+  @media (max-width: 991px) {
+    flex-direction: column;
+    gap: 1rem;                     /* 16px ÷ 16 - WCAG Accessible */
+  }
+
+  .topstrip-right {
+    display: flex;
+
+    @media (max-width: 991px) {
+      flex-direction: column;
+      gap: 16px;
+    }
+  }
+
+  .topstrip-right-inner {
+    display: flex;
+
+    @media (max-width: 767px) {
+      flex-direction: column;
+      gap: 16px;
+    }
+  }
+
+  .linkbar {
+    border-left: 1px solid rgba(255, 255, 255, 0.4);
+    padding-left: 1.25rem;         /* 20px ÷ 16 - WCAG Accessible */
+  }
+
+  .text-linear-gradient {
+    background: linear-gradient(90deg, #FFFFFF 0%, #8D70F8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-fill-color: transparent;
+  }
+
+  .live-preview-drop {
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 0.4375rem;      /* 7px ÷ 16 - WCAG Accessible */
+
+    &:hover,
+    &:active {
+      background-color: #8D70F8;
+    }
+
+  }
+
+  .get-pro-btn {
+    background-color: #8D70F8;
+    border-radius: 0.4375rem;      /* 7px ÷ 16 - WCAG Accessible */
+
+    &:hover {
+      background-color: #714BFF;
+    }
+  }
+
+  .all-access-pass-btn {
+    background-color: #B3F143;
+    color: #000000 !important;
+    border-radius: 0.4375rem;      /* 7px ÷ 16 - WCAG Accessible */
+
+    &:hover {
+      background-color: #90DE03;
+    }
+  }
+
+  .link-hover {
+    height: auto;
+
+    &:hover,
+    &:active {
+      color: #714BFF !important;
+
+      .mat-mdc-button-persistent-ripple {
+        &::before {
+          opacity: 0 !important;
+        }
+      }
+    }
+  }
+
+}

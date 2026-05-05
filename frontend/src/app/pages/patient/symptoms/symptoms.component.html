@@ -1,0 +1,143 @@
+<div class="container" role="main">
+  <!-- Skip to form -->
+  <a href="#symptoms-form" class="skip-to-form">Skip to form</a>
+
+  <div class="page-header">
+    <h2 id="symptoms-title">My Symptoms</h2>
+    <p class="kb-tip" role="note">
+      <mat-icon aria-hidden="true">keyboard</mat-icon>
+      Use <kbd>Tab</kbd> to navigate, <kbd>Space</kbd> to check/uncheck symptoms, <kbd>Enter</kbd> to submit.
+    </p>
+  </div>
+
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Report Symptoms</mat-card-title>
+      <mat-card-subtitle>Check all symptoms you are experiencing today</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+        <div *ngIf="submittedToday" class="already-submitted">
+    <mat-card>
+      <mat-card-content>
+        <p>You have already reported your symptoms today. You can do this again tomorrow.</p>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+<form
+  *ngIf="!submittedToday"
+  id="symptoms-form"
+  [formGroup]="symptomsForm"
+  (ngSubmit)="onSubmit()"
+  aria-labelledby="symptoms-title"
+  novalidate>
+
+        <fieldset class="symptoms-fieldset">
+          <legend class="symptoms-legend">Select your symptoms</legend>
+
+          <div class="symptoms-list" role="list" aria-label="Symptom checkboxes">
+            <div
+                *ngFor="let symptom of availableSymptoms; let i = index"
+                class="symptom-item"
+                role="listitem">
+
+                <!-- unified label column -->
+                <div class="symptom-label" id="label-{{ symptom.name }}">{{ symptom.label }}</div>
+
+                <!-- control column: checkbox (placed to the right) and optional scale -->
+                <ng-container *ngIf="symptom.control === 'checkbox'">
+                  <div class="checkbox-control">
+                    <mat-checkbox
+                      [formControl]="getFormControl(symptom.name)"
+                      [id]="'symptom-' + symptom.name"
+                      tabindex="0">
+                      <span class="visually-hidden">{{ symptom.label }}</span>
+                    </mat-checkbox>
+
+                    <mat-form-field
+                      *ngIf="symptom.maxScale && symptomsForm.get(symptom.name)?.value"
+                      appearance="outline"
+                      class="scale-field">
+                      <mat-label>Severity (0-{{ symptom.maxScale }})</mat-label>
+                      <input
+                        matInput
+                        type="number"
+                        [formControl]="getFormControl(symptom.name + 'Scale')"
+                        min="0"
+                        [id]="'scale-' + symptom.name"
+                        [attr.aria-label]="symptom.label + ' severity scale'"
+                        tabindex="0">
+                      <mat-hint>0 = none, {{ symptom.maxScale }} = severe</mat-hint>
+                      <mat-error
+                        *ngIf="symptomsForm.get(symptom.name + 'Scale')?.hasError('min') || symptomsForm.get(symptom.name + 'Scale')?.hasError('max')"
+                        role="alert">
+                        Between 0 and {{ symptom.maxScale }}
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+                </ng-container>
+
+                <ng-container *ngIf="symptom.control === 'scale'">
+                  <mat-form-field appearance="outline" class="scale-field">
+                    <mat-label>Severity (0-{{ symptom.maxScale }})</mat-label>
+                    <input
+                      matInput
+                      type="number"
+                      [formControl]="getFormControl(symptom.name + 'Scale')"
+                      min="0"
+                      [id]="'scale-' + symptom.name"
+                      [attr.aria-label]="symptom.label + ' severity scale'"
+                      tabindex="0">
+                    <mat-hint>0 = none, {{ symptom.maxScale }} = severe</mat-hint>
+                    <mat-error
+                      *ngIf="symptomsForm.get(symptom.name + 'Scale')?.hasError('min') || symptomsForm.get(symptom.name + 'Scale')?.hasError('max')"
+                      role="alert">
+                      Between 0 and {{ symptom.maxScale }}
+                    </mat-error>
+                  </mat-form-field>
+                </ng-container>
+
+              </div>
+          </div>
+        </fieldset>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Additional Notes</mat-label>
+          <textarea
+            matInput
+            formControlName="notes"
+            rows="3"
+            id="symptoms-notes"
+            aria-describedby="notes-hint"
+            tabindex="0">
+          </textarea>
+          <mat-hint id="notes-hint">Optional — add any additional details about your symptoms</mat-hint>
+        </mat-form-field>
+
+        <div class="form-actions">
+          <button
+            mat-raised-button
+            color="primary"
+            type="submit"
+            [disabled]="isLoading"
+            aria-label="Submit symptoms report"
+            tabindex="0">
+            <mat-icon aria-hidden="true">send</mat-icon>
+            <span *ngIf="!isLoading">Save</span>
+            <span *ngIf="isLoading" aria-live="polite">Saving...</span>
+          </button>
+        </div>
+
+        <div *ngIf="successMessage" class="alert-success" role="alert" aria-live="polite">
+          <mat-icon>check_circle</mat-icon>
+          {{ successMessage }}
+        </div>
+        <div *ngIf="errorMessage" class="alert-error" role="alert" aria-live="assertive">
+          <mat-icon>error</mat-icon>
+          {{ errorMessage }}
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

@@ -1,0 +1,54 @@
+@if (item.navCap) {
+  <div mat-subheader class="nav-caption">
+    {{ item.navCap | translate }}
+  </div>
+}
+
+@if (!item.navCap && !item.external && isVisible(item)) {
+  <a
+    mat-list-item
+    (click)="onItemSelected(item)"
+    [ngClass]="{
+      activeMenu: item.route ? router.isActive(item.route, true) : false,
+      expanded: expanded,
+      disabled: item.disabled
+    }"
+    class="menu-list-item {{ item.bgcolor }}"
+  >
+    <i-tabler class="routeIcon" name="{{ item.iconName }}" matListItemIcon></i-tabler>
+    <span>{{ item.displayName | translate }}</span>
+    @if (item.shortcutKey) {
+      <span class="shortcut-badge">{{ item.shortcutKey }}</span>
+    }
+
+    @if (visibleChildren(item).length) {
+      <span class="arrow-icon" fxFlex>
+        <span fxFlex></span>
+        <mat-icon [@indicatorRotate]="expanded ? 'expanded' : 'collapsed'">
+          expand_more
+        </mat-icon>
+      </span>
+    }
+  </a>
+}
+
+@if (!item.navCap && item.external && isVisible(item)) {
+  <mat-list-item
+    (click)="openExternalLink(item.route)"
+    class="menu-list-item {{ item.bgcolor }}"
+    target="_blank"
+  >
+    <i-tabler class="routeIcon" name="{{ item.iconName }}" matListItemIcon></i-tabler>
+    <span>{{ item.displayName }}</span>
+  </mat-list-item>
+}
+
+@if (expanded) {
+  @for (child of visibleChildren(item); track child) {
+    <app-nav-item
+      [item]="child"
+      (click)="onSubItemSelected(child)"
+      [depth]="depth + 1"
+    ></app-nav-item>
+  }
+}
