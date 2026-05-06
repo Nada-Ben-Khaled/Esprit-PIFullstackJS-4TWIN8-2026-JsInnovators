@@ -26,7 +26,7 @@ async function bootstrap() {
     origin: [
       'http://localhost:4200',
       'https://esprit-pi-fullstack-js-4-twin-8-202.vercel.app',
-      'https://esprit-pi-fullstack-js-4-twin-8-202-ten.vercel.app',
+      'https://esprit-pi-fullstack-js-4-twin-8-202-ten.vercel.app',kifch 
     ],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
