@@ -11,7 +11,7 @@ export class AiService {
   // Gemini client
   private geminiClient: any | null = null;
   private geminiModel: string;
-  private mlUrl: string;
+  private mlUrl: any | null = null;
 
   constructor(
     private readonly config: ConfigService,
@@ -23,8 +23,7 @@ export class AiService {
     @InjectModel('AiAuditLog') private readonly auditLogModel: Model<any>,
     @InjectModel('AiService') private readonly serviceModel: Model<any>,
   ) {
-    this.mlUrl =
-      this.config.get<string>('ML_API_URL') || 'http://127.0.0.1:5001';
+    this.mlUrl = this.config.get<string>('ML_API_URL');
 
     const geminiKey =
       this.config.get<string>('GEMINI_API_KEY') ||

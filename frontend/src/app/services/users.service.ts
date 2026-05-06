@@ -4,11 +4,10 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class UserService {
-
-  private api = `http://localhost:3000/users`;
+  private api = `${environment.apiUrl}/users`;
 
   constructor(private http: HttpClient) {}
 

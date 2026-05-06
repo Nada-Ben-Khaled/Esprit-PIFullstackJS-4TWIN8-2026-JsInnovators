@@ -1,4 +1,4 @@
-import { environment } from "src/environments/environment";
+import { environment } from 'src/environments/environment';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -6,27 +6,27 @@ import { Observable } from 'rxjs';
 export interface AuditLog {
   _id: string;
   // 1. ESSENTIELS
-  userId:    string;
+  userId: string;
   userEmail: string;
-  userRole:  string;
-  userName:  string;
-  action:    string;
+  userRole: string;
+  userName: string;
+  action: string;
   entityType: string;
-  entityId:   string;
+  entityId: string;
   // 2. TRAÇABILITÉ
   before: any;
-  after:  any;
+  after: any;
   // 3. SÉCURITÉ
-  status:    'SUCCESS' | 'FAILED';
+  status: 'SUCCESS' | 'FAILED';
   ipAddress: string;
   userAgent: string;
   // 4. ANALYSE
-  riskLevel:     'NORMAL' | 'SUSPICIOUS' | 'CRITICAL';
+  riskLevel: 'NORMAL' | 'SUSPICIOUS' | 'CRITICAL';
   loginAttempts: number;
-  sessionId:     string;
+  sessionId: string;
   // 5. CONTEXTE
   description: string;
-  module:      string;
+  module: string;
   // META
   createdAt: string;
 }
@@ -48,7 +48,7 @@ export interface AuditStats {
 
 @Injectable({ providedIn: 'root' })
 export class AuditApiService {
-  private base = `http://localhost:3000/audit`;
+  private base = `${environment.apiUrl}/audit`;
 
   constructor(private http: HttpClient) {}
 

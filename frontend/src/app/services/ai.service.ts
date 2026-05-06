@@ -1,9 +1,8 @@
-import { environment } from "src/environments/environment";
+import { environment } from 'src/environments/environment';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { API_BASE_URL } from '../core/api.config';
-
 
 export interface PatientContext {
   name?: string;
@@ -30,7 +29,13 @@ export class AiService {
 
   constructor(private http: HttpClient) {}
 
-  sendMessage(message: string, patientContext?: PatientContext): Observable<{ response: string }> {
-    return this.http.post<{ response: string }>(`${this.apiUrl}/chat`, { message, patientContext });
+  sendMessage(
+    message: string,
+    patientContext?: PatientContext,
+  ): Observable<{ response: string }> {
+    return this.http.post<{ response: string }>(`${this.apiUrl}/chat`, {
+      message,
+      patientContext,
+    });
   }
 }

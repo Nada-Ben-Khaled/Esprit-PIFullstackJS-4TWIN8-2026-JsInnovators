@@ -1,6 +1,12 @@
 import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { CoordinatorService, buildReminderMessages } from './coordinator.service';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {
+  CoordinatorService,
+  buildReminderMessages,
+} from './coordinator.service';
 
 describe('CoordinatorService', () => {
   let service: CoordinatorService;
@@ -27,7 +33,11 @@ describe('CoordinatorService', () => {
 
   describe('getDashboard', () => {
     it('should GET dashboard for coordinator', () => {
-      const mockResponse = { summary: { totalAssignedPatients: 5 }, departmentDistribution: [], recentPatients: [] };
+      const mockResponse = {
+        summary: { totalAssignedPatients: 5 },
+        departmentDistribution: [],
+        recentPatients: [],
+      };
 
       service.getDashboard(coordId).subscribe((res) => {
         expect(res.summary.totalAssignedPatients).toBe(5);
@@ -42,7 +52,13 @@ describe('CoordinatorService', () => {
   describe('getAssignedPatients', () => {
     it('should GET assigned patients list', () => {
       const mockPatients = [
-        { _id: 'p1', name: 'Karim Sassi', email: 'k@test.com', department: 'Cardiology', status: 'Complete' },
+        {
+          _id: 'p1',
+          name: 'Karim Sassi',
+          email: 'k@test.com',
+          department: 'Cardiology',
+          status: 'Complete',
+        },
       ];
 
       service.getAssignedPatients(coordId).subscribe((res) => {
@@ -59,7 +75,13 @@ describe('CoordinatorService', () => {
   describe('getComplianceToday', () => {
     it('should GET compliance data for today', () => {
       const mockCompliance = [
-        { _id: 'p1', name: 'Nada Ben Ali', isFullyCompliant: false, vitalsSubmitted: false, symptomsSubmitted: true },
+        {
+          _id: 'p1',
+          name: 'Nada Ben Ali',
+          isFullyCompliant: false,
+          vitalsSubmitted: false,
+          symptomsSubmitted: true,
+        },
       ];
 
       service.getComplianceToday(coordId).subscribe((res) => {
@@ -75,8 +97,18 @@ describe('CoordinatorService', () => {
   describe('getReminders', () => {
     it('should GET reminders for coordinator', () => {
       const mockReminders = [
-        { _id: 'r1', type: 'follow_up', message: 'Please complete.', status: 'sent' },
-        { _id: 'r2', type: 'follow_up', message: 'Urgent.', status: 'scheduled' },
+        {
+          _id: 'r1',
+          type: 'follow_up',
+          message: 'Please complete.',
+          status: 'sent',
+        },
+        {
+          _id: 'r2',
+          type: 'follow_up',
+          message: 'Urgent.',
+          status: 'scheduled',
+        },
       ];
 
       service.getReminders(coordId).subscribe((res) => {
@@ -92,7 +124,11 @@ describe('CoordinatorService', () => {
 
   describe('createReminder', () => {
     it('should POST a new reminder', () => {
-      const body = { patientId: 'p1', type: 'follow_up', message: 'Please submit your data.' };
+      const body = {
+        patientId: 'p1',
+        type: 'follow_up',
+        message: 'Please submit your data.',
+      };
       const mockCreated = { _id: 'r1', ...body, status: 'scheduled' };
 
       service.createReminder(coordId, body).subscribe((res: any) => {
@@ -177,7 +213,9 @@ describe('CoordinatorService', () => {
         expect(res.missingSymptoms).toContain('Pain Level');
       });
 
-      const req = httpMock.expectOne(`${apiUrl}/${coordId}/patients/p1/message`);
+      const req = httpMock.expectOne(
+        `${apiUrl}/${coordId}/patients/p1/message`,
+      );
       expect(req.request.method).toBe('GET');
       req.flush(mockMsg);
     });
@@ -185,28 +223,37 @@ describe('CoordinatorService', () => {
 
   describe('buildReminderMessages', () => {
     it('should include combined message when both vitals and symptoms are missing', () => {
-      const msgs = buildReminderMessages(['Temperature', 'Weight'], ['Pain Level']);
+      const msgs = buildReminderMessages(
+        ['Temperature', 'Weight'],
+        ['Pain Level'],
+      );
       const combined = msgs.find((m) => m.label.includes('vitals + symptoms'));
       expect(combined).toBeDefined();
     });
 
     it('should include vitals-only message when only vitals are missing', () => {
       const msgs = buildReminderMessages(['Temperature'], []);
-      const vitalsMsg = msgs.find((m) => m.label.toLowerCase().includes('vitals'));
+      const vitalsMsg = msgs.find((m) =>
+        m.label.toLowerCase().includes('vitals'),
+      );
       expect(vitalsMsg).toBeDefined();
       expect(vitalsMsg?.value).toContain('Temperature');
     });
 
     it('should include symptoms-only message when only symptoms are missing', () => {
       const msgs = buildReminderMessages([], ['Fatigue Level']);
-      const symptomsMsg = msgs.find((m) => m.label.toLowerCase().includes('symptoms'));
+      const symptomsMsg = msgs.find((m) =>
+        m.label.toLowerCase().includes('symptoms'),
+      );
       expect(symptomsMsg).toBeDefined();
       expect(symptomsMsg?.value).toContain('Fatigue Level');
     });
 
     it('should always include a general follow-up message', () => {
       const msgs = buildReminderMessages([], []);
-      const general = msgs.find((m) => m.label === 'General follow-up reminder');
+      const general = msgs.find(
+        (m) => m.label === 'General follow-up reminder',
+      );
       expect(general).toBeDefined();
     });
 

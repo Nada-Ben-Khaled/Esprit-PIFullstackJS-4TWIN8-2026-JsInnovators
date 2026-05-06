@@ -1,4 +1,11 @@
-import { Component, EventEmitter, Input, OnInit, OnDestroy, Output } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  OnDestroy,
+  Output,
+} from '@angular/core';
 import { TablerIconComponent } from 'angular-tabler-icons';
 import { CommonModule, UpperCasePipe } from '@angular/common';
 import { Router } from '@angular/router';
@@ -10,25 +17,33 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { interval, Subscription } from 'rxjs';
 import { startWith, switchMap, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
-import { NotificationBellService, AppNotification } from 'src/app/services/notification-bell.service';
+import {
+  NotificationBellService,
+  AppNotification,
+} from 'src/app/services/notification-bell.service';
 import { clearAuthLocalStorage } from 'src/app/core/app-storage';
 import { CoreService } from 'src/app/services/core.service';
-import { environment } from "src/environments/environment";
+import { environment } from 'src/environments/environment';
 @Component({
   selector: 'app-topstrip',
   standalone: true,
   imports: [
-    CommonModule, UpperCasePipe, TablerIconComponent,
-    MatButtonModule, MatMenuModule, MatTooltipModule, MatDividerModule,
+    CommonModule,
+    UpperCasePipe,
+    TablerIconComponent,
+    MatButtonModule,
+    MatMenuModule,
+    MatTooltipModule,
+    MatDividerModule,
     TranslateModule,
   ],
   templateUrl: './topstrip.component.html',
 })
 export class AppTopstripComponent implements OnInit, OnDestroy {
-  @Input()  showToggle = false;
-  @Output() toggleNav  = new EventEmitter<void>();
+  @Input() showToggle = false;
+  @Output() toggleNav = new EventEmitter<void>();
 
-  selectedLanguage    = localStorage.getItem('app_language') || 'en';
+  selectedLanguage = localStorage.getItem('app_language') || 'en';
   highContrastEnabled = localStorage.getItem('high_contrast') === 'true';
 
   availableLanguages = [
@@ -42,19 +57,30 @@ export class AppTopstripComponent implements OnInit, OnDestroy {
   private notifSub?: Subscription;
 
   get userEmail(): string {
-    try { return JSON.parse(localStorage.getItem('medi_follow_user_data') || '{}').email || ''; }
-    catch { return ''; }
+    try {
+      return (
+        JSON.parse(localStorage.getItem('medi_follow_user_data') || '{}')
+          .email || ''
+      );
+    } catch {
+      return '';
+    }
   }
 
   get userRole(): string {
     return localStorage.getItem('user_role') || 'User';
   }
 
-  get unreadNotifs(): AppNotification[] { return this.notifications.filter(n => !n.isRead); }
+  get unreadNotifs(): AppNotification[] {
+    return this.notifications.filter((n) => !n.isRead);
+  }
 
   get currentUserData(): any {
-    try { return JSON.parse(localStorage.getItem('medi_follow_user_data') || '{}'); }
-    catch { return {}; }
+    try {
+      return JSON.parse(localStorage.getItem('medi_follow_user_data') || '{}');
+    } catch {
+      return {};
+    }
   }
 
   get userInitials(): string {
@@ -76,15 +102,21 @@ export class AppTopstripComponent implements OnInit, OnDestroy {
   get userAvatar(): string | null {
     const data = this.currentUserData;
     const photoSource = data.photo || data.image || data.avatar;
-    
-    if (photoSource && typeof photoSource === 'string' && photoSource !== 'null' && photoSource !== 'undefined' && photoSource !== '') {
+
+    if (
+      photoSource &&
+      typeof photoSource === 'string' &&
+      photoSource !== 'null' &&
+      photoSource !== 'undefined' &&
+      photoSource !== ''
+    ) {
       let photoPath = photoSource.replace(/\\/g, '/');
       if (photoPath.startsWith('http')) {
         return photoPath;
       } else if (photoPath.startsWith('uploads/')) {
-        return `http://localhost:3000/${photoPath}`;
+        return `${environment.apiUrl}/${photoPath}`;
       } else {
-        return `http://localhost:3000/uploads/${photoPath}`;
+        return `${environment.apiUrl}/uploads/${photoPath}`;
       }
     }
     return null;
@@ -96,24 +128,34 @@ export class AppTopstripComponent implements OnInit, OnDestroy {
     private core: CoreService,
     private router: Router,
   ) {
-    this.translate.onLangChange.subscribe(e => this.selectedLanguage = e.lang);
+    this.translate.onLangChange.subscribe(
+      (e) => (this.selectedLanguage = e.lang),
+    );
     this.setHighContrastClass();
   }
 
   ngOnInit(): void {
     const token = localStorage.getItem('accessToken');
     if (token) {
-      this.notifSub = interval(30000).pipe(
-        startWith(0),
-        switchMap(() => this.notifService.getMyNotifications().pipe(catchError(() => of([])))),
-      ).subscribe((notifs: AppNotification[]) => {
-        this.notifications = notifs.slice(0, 10);
-        this.unreadCount   = notifs.filter(n => !n.isRead).length;
-      });
+      this.notifSub = interval(30000)
+        .pipe(
+          startWith(0),
+          switchMap(() =>
+            this.notifService
+              .getMyNotifications()
+              .pipe(catchError(() => of([]))),
+          ),
+        )
+        .subscribe((notifs: AppNotification[]) => {
+          this.notifications = notifs.slice(0, 10);
+          this.unreadCount = notifs.filter((n) => !n.isRead).length;
+        });
     }
   }
 
-  ngOnDestroy(): void { this.notifSub?.unsubscribe(); }
+  ngOnDestroy(): void {
+    this.notifSub?.unsubscribe();
+  }
 
   markRead(n: AppNotification): void {
     if (n.isRead) return;
@@ -125,7 +167,7 @@ export class AppTopstripComponent implements OnInit, OnDestroy {
 
   markAllRead(): void {
     this.notifService.markAllRead().subscribe(() => {
-      this.notifications.forEach(n => n.isRead = true);
+      this.notifications.forEach((n) => (n.isRead = true));
       this.unreadCount = 0;
     });
     const role = (localStorage.getItem('user_role') || '').toLowerCase();
@@ -143,19 +185,23 @@ export class AppTopstripComponent implements OnInit, OnDestroy {
 
   getTypeIcon(type: string): string {
     const map: Record<string, string> = {
-      alert: 'alert-triangle', reminder: 'clock', message: 'message',
-      info: 'info-circle', success: 'circle-check', user: 'user',
+      alert: 'alert-triangle',
+      reminder: 'clock',
+      message: 'message',
+      info: 'info-circle',
+      success: 'circle-check',
+      user: 'user',
     };
     return map[type?.toLowerCase()] ?? 'bell';
   }
 
   timeAgo(dateStr: string): string {
-    const diff  = Date.now() - new Date(dateStr).getTime();
-    const mins  = Math.floor(diff / 60000);
+    const diff = Date.now() - new Date(dateStr).getTime();
+    const mins = Math.floor(diff / 60000);
     const hours = Math.floor(diff / 3600000);
-    const days  = Math.floor(diff / 86400000);
-    if (mins  < 1)  return 'just now';
-    if (mins  < 60) return `${mins}m ago`;
+    const days = Math.floor(diff / 86400000);
+    if (mins < 1) return 'just now';
+    if (mins < 60) return `${mins}m ago`;
     if (hours < 24) return `${hours}h ago`;
     return `${days}d ago`;
   }
@@ -170,12 +216,18 @@ export class AppTopstripComponent implements OnInit, OnDestroy {
 
   toggleHighContrast(): void {
     this.highContrastEnabled = !this.highContrastEnabled;
-    localStorage.setItem('high_contrast', this.highContrastEnabled ? 'true' : 'false');
+    localStorage.setItem(
+      'high_contrast',
+      this.highContrastEnabled ? 'true' : 'false',
+    );
     this.setHighContrastClass();
   }
 
   setHighContrastClass(): void {
-    document.documentElement.classList.toggle('high-contrast', this.highContrastEnabled);
+    document.documentElement.classList.toggle(
+      'high-contrast',
+      this.highContrastEnabled,
+    );
     document.body.classList.toggle('high-contrast', this.highContrastEnabled);
   }
 
@@ -183,10 +235,10 @@ export class AppTopstripComponent implements OnInit, OnDestroy {
     const role = (localStorage.getItem('user_role') || '').toLowerCase();
     const profileRoutes: Record<string, string> = {
       superadmin: '/super-admin/profile',
-      doctor:     '/dashboard/doctor/profile',
-      nurse:      '/dashboard/nurse/profile',
-      patient:    '/dashboard/patient/profile',
-      coordinator:'/admin/coordinator/profile',
+      doctor: '/dashboard/doctor/profile',
+      nurse: '/dashboard/nurse/profile',
+      patient: '/dashboard/patient/profile',
+      coordinator: '/admin/coordinator/profile',
     };
     this.router.navigate([profileRoutes[role] || '/dashboard/profile']);
   }

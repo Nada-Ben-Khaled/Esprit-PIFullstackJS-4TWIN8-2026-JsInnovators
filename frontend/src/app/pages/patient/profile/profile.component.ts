@@ -1,4 +1,5 @@
-?import { Component, OnInit } from '@angular/core';
+?import { environment } from 'src/environments/environment';
+import { Component, OnInit } from '@angular/core';
 import { TablerIconComponent } from 'angular-tabler-icons';
 import { CommonModule } from '@angular/common';
 import { MaterialModule } from 'src/app/material.module';
@@ -45,8 +46,8 @@ export class ProfilComponent implements OnInit {
         if (user.photo && typeof user.photo === 'string' && user.photo !== 'null' && user.photo !== 'undefined' && user.photo !== '') {
           const photoPath = user.photo.replace(/\\/g, '/');
           avatarUrl = photoPath.startsWith('uploads/') || photoPath.startsWith('http')
-            ? `http://localhost:3000/${photoPath}`
-            : `http://localhost:3000/uploads/${photoPath}`;
+            ? `${environment.apiUrl}/${photoPath}`
+            : `${environment.apiUrl}/uploads/${photoPath}`;
         }
 
         this.profile = {

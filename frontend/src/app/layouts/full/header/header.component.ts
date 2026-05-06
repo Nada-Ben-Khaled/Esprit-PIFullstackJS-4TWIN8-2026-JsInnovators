@@ -1,6 +1,12 @@
 import { environment } from 'src/environments/environment';
 import {
-  Component, Output, EventEmitter, Input, ViewEncapsulation, OnInit, OnDestroy,
+  Component,
+  Output,
+  EventEmitter,
+  Input,
+  ViewEncapsulation,
+  OnInit,
+  OnDestroy,
 } from '@angular/core';
 import { TablerIconComponent } from 'angular-tabler-icons';
 import { CommonModule } from '@angular/common';
@@ -12,7 +18,10 @@ import { PatientService } from 'src/app/services/patient.service';
 import { CoreService } from 'src/app/services/core.service';
 import { ZoomControlComponent } from './zoom-control.component';
 import { clearAuthLocalStorage } from 'src/app/core/app-storage';
-import { NotificationBellService, AppNotification } from 'src/app/services/notification-bell.service';
+import {
+  NotificationBellService,
+  AppNotification,
+} from 'src/app/services/notification-bell.service';
 import { interval, Subscription } from 'rxjs';
 import { startWith, switchMap, catchError } from 'rxjs/operators';
 import { UserService } from 'src/app/services/users.service';
@@ -24,8 +33,12 @@ import { API_BASE_URL } from 'src/app/core/api.config';
   selector: 'app-header',
   standalone: true,
   imports: [
-    CommonModule, RouterModule, NgScrollbarModule,
-    TablerIconComponent, MaterialModule, TranslateModule,
+    CommonModule,
+    RouterModule,
+    NgScrollbarModule,
+    TablerIconComponent,
+    MaterialModule,
+    TranslateModule,
     ZoomControlComponent,
   ],
   templateUrl: './header.component.html',
@@ -50,12 +63,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
     private patientService: PatientService,
     private notifService: NotificationBellService,
     private http: HttpClient,
-    private userService: UserService
+    private userService: UserService,
   ) {}
 
-
-
-  
   ngOnInit(): void {
     this.core.initUserRole();
 
@@ -70,34 +80,53 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.userService.getProfile().subscribe({
       next: (user) => {
         this.currentUser = { ...user };
-        if (this.currentUser.photo && typeof this.currentUser.photo === 'string' && this.currentUser.photo !== 'null' && this.currentUser.photo !== 'undefined' && this.currentUser.photo !== '') {
+        if (
+          this.currentUser.photo &&
+          typeof this.currentUser.photo === 'string' &&
+          this.currentUser.photo !== 'null' &&
+          this.currentUser.photo !== 'undefined' &&
+          this.currentUser.photo !== ''
+        ) {
           const photoPath = this.currentUser.photo.replace(/\\/g, '/');
-          this.currentUser.photoUrl = photoPath.startsWith('uploads/') || photoPath.startsWith('http')
-            ? `<http://localhost:3000>/${photoPath}`
-            : `http://localhost:3000/uploads/${photoPath}`;
+          this.currentUser.photoUrl =
+            photoPath.startsWith('uploads/') || photoPath.startsWith('http')
+              ? `${environment.apiUrl}/${photoPath}`
+              : `${environment.apiUrl}/uploads/${photoPath}`;
         } else {
           this.currentUser.photoUrl = '/assets/images/profile/user-1.jpg';
         }
       },
-      error: () => {}
+      error: () => {},
     });
 
     const token = localStorage.getItem('accessToken');
     if (token) {
-      this.notifSub = interval(30000).pipe(
-        startWith(0),
-        switchMap(() => this.notifService.getMyNotifications().pipe(catchError(() => of([])))),
-      ).subscribe((notifs: AppNotification[]) => {
-        this.notifications = notifs.slice(0, 10);
-        this.unreadCount = notifs.filter(n => !n.isRead).length;
-      });
+      this.notifSub = interval(30000)
+        .pipe(
+          startWith(0),
+          switchMap(() =>
+            this.notifService
+              .getMyNotifications()
+              .pipe(catchError(() => of([]))),
+          ),
+        )
+        .subscribe((notifs: AppNotification[]) => {
+          this.notifications = notifs.slice(0, 10);
+          this.unreadCount = notifs.filter((n) => !n.isRead).length;
+        });
     }
   }
 
-  ngOnDestroy(): void { this.notifSub?.unsubscribe(); }
+  ngOnDestroy(): void {
+    this.notifSub?.unsubscribe();
+  }
 
-  get unreadNotifs(): AppNotification[] { return this.notifications.filter(n => !n.isRead); }
-  get readNotifs(): AppNotification[]   { return this.notifications.filter(n => n.isRead); }
+  get unreadNotifs(): AppNotification[] {
+    return this.notifications.filter((n) => !n.isRead);
+  }
+  get readNotifs(): AppNotification[] {
+    return this.notifications.filter((n) => n.isRead);
+  }
 
   markRead(notif: AppNotification): void {
     if (notif.isRead) return;
@@ -109,16 +138,23 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   markAllRead(): void {
     this.notifService.markAllRead().subscribe(() => {
-      this.notifications.forEach(n => n.isRead = true);
+      this.notifications.forEach((n) => (n.isRead = true));
       this.unreadCount = 0;
     });
   }
 
   getTypeIcon(type: string): string {
     const map: Record<string, string> = {
-      alert: 'alert-triangle', reminder: 'clock', appointment: 'calendar',
-      message: 'message', info: 'info-circle', success: 'circle-check',
-      warning: 'alert-circle', error: 'circle-x', user: 'user', questionnaire: 'clipboard-list',
+      alert: 'alert-triangle',
+      reminder: 'clock',
+      appointment: 'calendar',
+      message: 'message',
+      info: 'info-circle',
+      success: 'circle-check',
+      warning: 'alert-circle',
+      error: 'circle-x',
+      user: 'user',
+      questionnaire: 'clipboard-list',
     };
     return map[type?.toLowerCase()] ?? 'circle-check';
   }
@@ -128,21 +164,19 @@ export class HeaderComponent implements OnInit, OnDestroy {
     const mins = Math.floor(diff / 60000);
     const hours = Math.floor(diff / 3600000);
     const days = Math.floor(diff / 86400000);
-    if (mins < 1)   return 'just now';
-    if (mins < 60)  return `${mins}m ago`;
+    if (mins < 1) return 'just now';
+    if (mins < 60) return `${mins}m ago`;
     if (hours < 24) return `${hours}h ago`;
     return `${days}d ago`;
   }
 
-
-
   /** Return true when current role has an alerts page we can navigate to */
   canNavigateToAlerts(): boolean {
     const r = (localStorage.getItem('user_role') || '').toLowerCase();
-    return r === 'patient' || r === 'nurse' || r === 'physician' || r === 'doctor';
+    return (
+      r === 'patient' || r === 'nurse' || r === 'physician' || r === 'doctor'
+    );
   }
-
-
 
   goToAlerts(): void {
     const r = (localStorage.getItem('user_role') || '').toLowerCase();
@@ -158,9 +192,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
     }
   }
 
-
-
-
   goToProfile(): void {
     const r = (localStorage.getItem('user_role') || '').toLowerCase();
     if (r === 'patient') {
@@ -170,18 +201,15 @@ export class HeaderComponent implements OnInit, OnDestroy {
     }
   }
 
-
-
-
-
   logout(): void {
     // Call backend to log the LOGOUT event in audit
-    this.http.post(`${API_BASE_URL}/auth/logout`, {}).pipe(
-      catchError(() => of(null))
-    ).subscribe(() => {
-      clearAuthLocalStorage();
-      this.core.clearRole();
-      this.router.navigate(['/authentication/login']);
-    });
+    this.http
+      .post(`${API_BASE_URL}/auth/logout`, {})
+      .pipe(catchError(() => of(null)))
+      .subscribe(() => {
+        clearAuthLocalStorage();
+        this.core.clearRole();
+        this.router.navigate(['/authentication/login']);
+      });
   }
 }
